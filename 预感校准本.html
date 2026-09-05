@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#6b7f5e">
+<title>预感校准本</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#f7f6f3;--card:#fff;--ink:#2b2925;--sub:#8a857c;--line:#e8e5df;--accent:#6b7f5e;--warn:#c1663f;--ok:#5a8a6a;--mid:#a8802f}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6;padding-bottom:70px}
+header{padding:22px 18px 12px;border-bottom:1px solid var(--line);background:var(--card)}
+h1{font-size:19px;font-weight:600;letter-spacing:.5px}
+header p{font-size:12px;color:var(--sub);margin-top:3px}
+.tabbar{display:flex;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:9}
+.tabbar button{flex:1;padding:13px 0;border:none;background:none;font-size:14px;color:var(--sub);font-family:inherit;position:relative}
+.tabbar button.on{color:var(--accent);font-weight:600;border-bottom:2px solid var(--accent)}
+.nbadge{display:inline-block;min-width:17px;padding:0 4px;border-radius:9px;background:var(--accent);color:#fff;font-size:11px;font-style:normal;line-height:17px;margin-left:3px}
+.nbadge.warn{background:var(--warn)}
+main{padding:14px}
+.page{display:none}.page.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:12px}
+label{display:block;font-size:12px;color:var(--sub);margin:14px 0 5px}
+label:first-child{margin-top:0}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:15px;font-family:inherit;background:#fdfdfc;color:var(--ink)}
+textarea{min-height:66px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+.scale{display:flex;gap:5px;margin-top:4px}
+.scale button{flex:1;padding:9px 0;border:1px solid var(--line);background:#fdfdfc;border-radius:7px;font-size:14px;color:var(--sub);font-family:inherit}
+.scale button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chips button{padding:6px 12px;border:1px solid var(--line);background:#fdfdfc;border-radius:15px;font-size:13px;color:var(--sub);font-family:inherit}
+.chips button.on{background:#eef1eb;border-color:var(--accent);color:var(--accent)}
+.btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;font-family:inherit;margin-top:16px}
+.btn.ghost{background:none;color:var(--sub);border:1px solid var(--line)}
+.btn.danger{background:none;color:var(--warn);border:1px solid #e5c9bc}
+.item{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:13px;margin-bottom:10px}
+.item.due{border-left:3px solid var(--warn)}
+.item .meta{font-size:11px;color:var(--sub);display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.item .txt{font-size:15px;line-height:1.55;white-space:pre-wrap}
+.item .r{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--sub)}
+.item .basis{font-size:12px;color:var(--sub);margin-top:6px}
+.item .body{color:#7a6a4f}
+.item .res{color:var(--ink)}
+.badge{padding:1px 7px;border-radius:9px;font-size:11px;background:#f0eee9;color:var(--sub)}
+.badge.hit{background:#e7f0e9;color:var(--ok)}
+.badge.mid{background:#f5efe4;color:var(--mid)}
+.badge.miss{background:#f6e9e3;color:var(--warn)}
+.badge.od{background:#f6e9e3;color:var(--warn);font-weight:600}
+.badge.kI{background:#e7f0e9;color:var(--ok)}
+.badge.kA{background:#f6e9e3;color:var(--warn)}
+.badge.kD{background:#efe9f4;color:#7a5c9e}
+.badge.kB{background:#e8eef4;color:#4c7296}
+.badge.kN{background:#f0eee9;color:var(--sub)}
+.acts{display:flex;gap:7px;margin-top:10px}
+.acts button{flex:1;padding:8px 0;border:1px solid var(--line);background:#fdfdfc;border-radius:8px;font-size:13px;font-family:inherit;color:var(--sub)}
+.acts button.ok{border-color:#cfe0d2;color:var(--ok);background:#f5faf6}
+.acts button.no{border-color:#e9cfc2;color:var(--warn);background:#fdf8f5}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 5px;text-align:right;border-bottom:1px solid var(--line);vertical-align:middle}
+th:first-child,td:first-child{text-align:left}
+th{font-size:11px;color:var(--sub);font-weight:500}
+tr.fade{opacity:.45}
+.bar{height:6px;background:#eeece7;border-radius:3px;overflow:hidden;min-width:52px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.empty{text-align:center;color:var(--sub);font-size:13px;padding:34px 10px}
+h2{font-size:15px;margin-bottom:10px}
+.hint{font-size:11px;color:var(--sub);margin-top:7px;line-height:1.6}
+.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:12px}
+.scard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center}
+.scard.clickable{cursor:pointer}
+.scard.clickable:active{background:#f0f3ec}
+.scard .k{font-size:11px;color:var(--sub)}
+.scard .v{font-size:20px;font-weight:700;margin-top:2px;letter-spacing:.3px}
+.scard .v.warn{color:var(--warn)}
+.scard .s{font-size:10px;color:var(--sub);margin-top:2px}
+.insight{background:#f2f5ef;border:1px solid #dde5d6;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.9;margin-bottom:12px;color:#3d4636}
+.insight b{color:var(--accent)}
+#toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(10px);background:rgba(43,41,37,.93);color:#fff;font-size:13px;padding:9px 18px;border-radius:18px;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:84%;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>预感校准本</h1>
+  <p>记录 · 到期验证 · 看见直觉在哪准、在哪瞎</p>
+</header>
+
+<div class="tabbar">
+  <button class="on" onclick="go(0)">记录</button>
+  <button id="tab_pending" onclick="go(1)">待验证</button>
+  <button onclick="go(2)">校准</button>
+  <button onclick="go(3)">数据</button>
+</div>
+
+<main>
+  <!-- ===== 记录 ===== -->
+  <section class="page on">
+    <div class="card">
+      <label>预感（一句话，写得越具体越可验证）</label>
+      <textarea id="f_text" placeholder="例：下周甲方会以预算为由拖付款"></textarea>
+
+      <label>强度 1–10（打完别回头改）</label>
+      <div class="scale" id="f_score"></div>
+
+      <label>领域</label>
+      <div class="chips" id="f_field"></div>
+
+      <label>来源通道</label>
+      <div class="chips" id="f_src"></div>
+
+      <label>当下判断：它更像直觉，还是情绪在伪装？（可先不标）</label>
+      <div class="chips" id="f_kind"></div>
+      <p class="hint">焦虑/欲望/偏见=喧闹反复、带着怕或想要；真直觉=安静、一次性、松的。标错没关系，验证后回看才有意义。</p>
+
+      <label>身体感（多选，可选）</label>
+      <div class="chips" id="f_body"></div>
+      <p class="hint">胸口发紧/胃部下坠偏「紧」，常跟着焦虑；肩膀松/莫名轻松偏「松」，常跟着真直觉。</p>
+
+      <label>依据（可选，你看到了什么）</label>
+      <textarea id="f_basis" placeholder="上周回款拖了3天，对接人临时换人"></textarea>
+
+      <label>验证日</label>
+      <input type="date" id="f_due">
+
+      <button class="btn" onclick="save()">存下这条预感</button>
+      <p class="hint">存完即进入「待验证」。到期那天打开点结果——没有验证的预感永远只是自我感觉良好。</p>
+    </div>
+  </section>
+
+  <!-- ===== 待验证 ===== -->
+  <section class="page">
+    <h2 id="h_pending">待验证</h2>
+    <div id="list_pending"></div>
+    <h2 style="margin-top:18px">已验证</h2>
+    <div id="list_done"></div>
+  </section>
+
+  <!-- ===== 校准 ===== -->
+  <section class="page">
+    <div class="scards" id="sumCards"></div>
+    <div class="insight" id="insight"></div>
+    <div class="card">
+      <h2>校准曲线 · 按强度档</h2>
+      <div id="tierChart"></div>
+      <p class="hint">曲线越高越好？不一定——看的是「高信心是否真的更高命中」。部分中按 0.5 计；n&lt;5 的档位请忽略。</p>
+    </div>
+    <div class="card">
+      <h2>直觉 vs 伪装者 · 按标记</h2>
+      <div id="t_kind"></div>
+      <p class="hint">这是整本的核心对照：被你标成「焦虑/欲望/偏见」的预感，命中率是不是明显低于「直觉」？</p>
+    </div>
+    <div class="card">
+      <h2>按来源通道</h2>
+      <div id="t_src"></div>
+    </div>
+    <div class="card">
+      <h2>按领域</h2>
+      <div id="t_field"></div>
+    </div>
+  </section>
+
+  <!-- ===== 数据 ===== -->
+  <section class="page">
+    <div class="card">
+      <p id="data_count" class="hint"></p>
+      <button class="btn ghost" onclick="expCSV()">导出 CSV（表格）</button>
+      <button class="btn ghost" onclick="expJSON()">备份（JSON）</button>
+      <label style="margin-top:14px">恢复备份（覆盖当前数据）</label>
+      <input type="file" accept=".json" onchange="impJSON(this)">
+      <button class="btn ghost" onclick="migrateV1()">并入旧版 v1 数据</button>
+      <button class="btn danger" onclick="clearAll()">清空全部数据</button>
+      <p class="hint">数据只存在这台设备的浏览器 localStorage 里，不联网、不上传。换设备/清缓存前先备份。v2 数据存于 gut_calib_v2，与旧版 gut_calib_v1 相互独立。</p>
+    </div>
+    <div class="card">
+      <h2>当 App 用</h2>
+      <p class="hint">安卓 Chrome：右上角 ⋮ → 添加到主屏幕。iPhone Safari：分享 → 添加到主屏幕。点图标打开即全屏离线运行。</p>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+/* __PURE_BEGIN__ */
+var TIERS=[
+  {min:9,label:'S5 笃定(9-10)'},
+  {min:7,label:'S4 较强(7-8)'},
+  {min:5,label:'S3 中等(5-6)'},
+  {min:3,label:'S2 微弱(3-4)'},
+  {min:1,label:'S1 闪念(1-2)'}
+];
+function pad(n){return n<10?'0'+n:''+n}
+function todayISO(off){
+  var t=new Date();if(off){t.setDate(t.getDate()+off)}
+  return t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate())
+}
+function tierIndex(n){
+  for(var i=0;i<TIERS.length;i++){if(n>=TIERS[i].min)return i}
+  return TIERS.length-1
+}
+function tierLabel(n){return TIERS[tierIndex(n)].label}
+function hitValue(r){return r==='中了'?1:(r==='部分中'?0.5:(r==='没中'?0:null))}
+function rateOf(items){
+  var n=items.length;if(!n)return null
+  var h=0;for(var i=0;i<items.length;i++){h+=hitValue(items[i].result)}
+  return {n:n,h:h,rate:Math.round(h/n*100)}
+}
+function overdueDays(it){
+  if(it.result)return 0
+  var due=Date.parse(it.due),td=Date.parse(todayISO())
+  if(isNaN(due))return 0
+  return due<td?Math.round((td-due)/86400000):0
+}
+function newRecord(f){
+  var id=Date.now().toString(36)+'-'+Math.floor(Math.random()*1e6).toString(36)
+  return {
+    id:id,date:todayISO(),
+    text:String(f.text||'').trim(),
+    score:(+f.score)||0,
+    field:f.field||'未分类',src:f.src||'未标',kind:f.kind||'未标',
+    body:(f.body&&f.body.join)?f.body.join('、'):(f.body||''),
+    basis:String(f.basis||'').trim(),
+    due:f.due||todayISO(30),
+    result:'',actual:'',doneDate:''
+  }
+}
+function applyVerdict(list,id,result,actual){
+  if(hitValue(result)==null)return false
+  for(var i=0;i<list.length;i++){if(list[i].id===id){list[i].result=result;list[i].actual=String(actual||'').trim();list[i].doneDate=todayISO();return true}}
+  return false
+}
+function reopenVerdict(list,id){
+  for(var i=0;i<list.length;i++){if(list[i].id===id){list[i].result='';list[i].actual='';list[i].doneDate='';return true}}
+  return false
+}
+function summarize(list){
+  var done=[],hi=[],lo=[],over=0
+  for(var i=0;i<list.length;i++){
+    var it=list[i]
+    if(!it.result){if(overdueDays(it)>0)over++;continue}
+    done.push(it)
+    if(it.score>=7)hi.push(it)
+    if(it.score<=4)lo.push(it)
+  }
+  var hits=0;for(var j=0;j<done.length;j++){hits+=hitValue(done[j].result)}
+  return {
+    total:list.length,done:done.length,hits:hits,
+    rate:done.length?rateOf(done).rate:null,hi:rateOf(hi),lo:rateOf(lo),overdue:over
+  }
+}
+function groupVerified(list,keyFn){
+  var map={},order=[]
+  for(var i=0;i<list.length;i++){
+    var it=list[i];if(!it.result)continue
+    var k=keyFn(it)
+    if(!(k in map)){map[k]=[];order.push(k)}
+    map[k].push(it)
+  }
+  var out=[]
+  for(var j=0;j<order.length;j++){out.push({k:order[j],items:map[order[j]]})}
+  return out
+}
+function tierGroups(list){
+  var out=[]
+  for(var i=0;i<TIERS.length;i++){
+    var items=[]
+    for(var j=0;j<list.length;j++){
+      var it=list[j]
+      if(it.result&&tierIndex(it.score)===i)items.push(it)
+    }
+    out.push({label:TIERS[i].label,items:items})
+  }
+  return out
+}
+function insight(st,byKind){
+  var L=[]
+  if(st.done===0){L.push('还没有任何已验证的记录。先去「待验证」给到期的预感打结果，校准曲线才会开始说话。');return L}
+  if(st.done<5){L.push('样本还太少（已验证 '+st.done+' 条），下面的数字基本是噪音——先攒到 10 条以上再看趋势。')}
+  else{L.push('已验证 '+st.done+' 条，总命中率 '+(st.rate==null?'—':st.rate+'%')+'（部分中按 0.5 计）。')}
+  var hi=st.hi,lo=st.lo
+  if(hi&&hi.n>=5&&lo&&lo.n>=5){
+    var d=hi.rate-lo.rate
+    if(d>=20)L.push('高强度(≥7)命中 '+hi.rate+'%，比低强度(≤4)高 '+d+' 个百分点——你的笃定有含金量，可以适度信任。')
+    else if(d<=-20)L.push('高强度反而比低强度低 '+(-d)+' 个百分点——越笃定越容易错，警惕「自信的假直觉」。')
+    else L.push('不同强度档的命中率差距不大，先别急着只信高分，也别全盘不信。')
+  }
+  else if(hi&&hi.n>=5){L.push('高强度预感已积累 '+hi.n+' 条、命中 '+hi.rate+'%，可以开始观察这条曲线的可信度。')}
+  if(st.done>=8){
+    function pick(k){for(var i=0;i<byKind.length;i++){if(byKind[i].k===k)return byKind[i]}return null}
+    var gi=pick('直觉'),ga=pick('疑似焦虑')
+    if(gi&&ga&&gi.items.length>=3&&ga.items.length>=3){
+      var gd=gi.items.reduce(function(s,x){return s+hitValue(x.result)},0)/gi.items.length*100
+      var ad=ga.items.reduce(function(s,x){return s+hitValue(x.result)},0)/ga.items.length*100
+      var dd=Math.round(gd-ad)
+      if(dd>=15)L.push('标记对照：直觉命中 '+Math.round(gd)+'%，疑似焦虑命中 '+Math.round(ad)+'%——被你识别成焦虑的预感明显更不准，标记在起作用。')
+      else if(dd<=-10)L.push('标记对照：疑似焦虑反而比直觉准 '+(-dd)+' 个百分点——你的「焦虑」可能正在编码真实风险，别急着全盘否定它。')
+    }
+  }
+  if(L.length===0)L.push('继续积累：低风险场景练手 + 到期必验证，三个月后曲线会自己开口。')
+  return L
+}
+/* __PURE_END__ */
+
+var V2_KEY='gut_calib_v2',V1_KEY='gut_calib_v1'
+var FIELDS=['识人','工作','项目','关系','身体','创作']
+var SRCS=['模式识别','身体感','睡眠浮现','情绪残留']
+var KINDS=['直觉','疑似焦虑','疑似欲望','疑似偏见']
+var BODIES=['胸口发紧','胃部下坠','肩膀松','呼吸变浅','莫名轻松','无感']
+var KEYMAP={f_field:'field',f_src:'src',f_kind:'kind',f_body:'body'}
+var SHORT_TIER=['笃定 9-10','较强 7-8','中等 5-6','微弱 3-4','闪念 1-2']
+
+var D=[]
+try{D=JSON.parse(localStorage.getItem(V2_KEY)||'[]')}catch(e){D=[]}
+if(!Array.isArray(D))D=[]
+var sel={score:0,field:'',src:'',kind:'',body:[]}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function persist(){try{localStorage.setItem(V2_KEY,JSON.stringify(D))}catch(e){toast('保存失败：存储空间可能已满')}}
+var _tt=null
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){t.classList.remove('show')},1900)}
+function go(i){
+  var bs=document.querySelectorAll('.tabbar button'),ps=document.querySelectorAll('.page')
+  for(var k=0;k<bs.length;k++){bs[k].classList.toggle('on',k===i)}
+  for(var k2=0;k2<ps.length;k2++){ps[k2].classList.toggle('on',k2===i)}
+}
+function kindCls(k){return k==='直觉'?'kI':(k==='疑似焦虑'?'kA':(k==='疑似欲望'?'kD':(k==='疑似偏见'?'kB':'kN')))}
+function resCls(r){return r==='中了'?'hit':(r==='部分中'?'mid':'miss')}
+
+function build(){
+  var sc=document.getElementById('f_score')
+  var titles=['','闪念','','微弱','','中等','','较强','','笃定']
+  for(var i=1;i<=10;i++){
+    var b=document.createElement('button')
+    b.type='button';b.textContent=''+i;b.title=titles[i]||''
+    b.onclick=(function(v){return function(){sel.score=(sel.score===v?0:v);paintScore()}})(i)
+    sc.appendChild(b)
+  }
+  chips('f_field',FIELDS)
+  chips('f_src',SRCS)
+  chips('f_kind',KINDS)
+  chips('f_body',BODIES)
+  resetDue()
+  paintAll()
+}
+function paintScore(){
+  var kids=document.getElementById('f_score').children
+  for(var i=0;i<kids.length;i++){kids[i].classList.toggle('on',sel.score===parseInt(kids[i].textContent,10))}
+}
+function repaint(key){
+  if(key==='score'){paintScore();return}
+  var id=null
+  for(var k in KEYMAP){if(KEYMAP[k]===key){id=k;break}}
+  if(!id)return
+  var el=document.getElementById(id),multi=(id==='f_body')
+  var kids=el.children
+  for(var i=0;i<kids.length;i++){
+    var v=kids[i].textContent,on=false
+    if(multi){on=sel[key].indexOf(v)>=0}
+    else{on=sel[key]===v}
+    kids[i].classList.toggle('on',on)
+  }
+}
+function paintAll(){paintScore();for(var k in KEYMAP){repaint(KEYMAP[k])}}
+function chips(id,opts){
+  var el=document.getElementById(id),key=KEYMAP[id],multi=(id==='f_body')
+  el.innerHTML=''
+  for(var i=0;i<opts.length;i++){
+    (function(o){
+      var b=document.createElement('button')
+      b.type='button';b.textContent=o
+      b.onclick=function(){
+        if(multi){
+          var cur=sel[key]
+          if(!Array.isArray(cur))cur=[]
+          var idx=cur.indexOf(o)
+          if(idx>=0)cur.splice(idx,1)
+          else cur.push(o)
+          sel[key]=cur.slice()
+        }else{
+          sel[key]=(sel[key]===o?'':o)
+        }
+        repaint(key)
+      }
+      el.appendChild(b)
+    })(opts[i])
+  }
+}
+function resetDue(){
+  var t=new Date();t.setDate(t.getDate()+30)
+  document.getElementById('f_due').value=t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate())
+}
+function clearForm(){
+  document.getElementById('f_text').value=''
+  document.getElementById('f_basis').value=''
+  sel={score:0,field:'',src:'',kind:'',body:[]}
+  paintAll();resetDue()
+}
+function save(){
+  var t=document.getElementById('f_text').value.trim()
+  if(!t){toast('预感内容不能为空');return}
+  if(!sel.score){toast('请先给强度打分 1–10');return}
+  var rec=newRecord({
+    text:t,score:sel.score,field:sel.field,src:sel.src,kind:sel.kind,body:sel.body,
+    basis:document.getElementById('f_basis').value,
+    due:document.getElementById('f_due').value
+  })
+  D.push(rec)
+  persist()
+  clearForm()
+  toast('已存第 '+D.length+' 条 · 验证日 '+rec.due)
+  render()
+  go(1)
+}
+function verdict(id,r){
+  var it=null
+  for(var i=0;i<D.length;i++){if(D[i].id===id){it=D[i];break}}
+  if(!it)return
+  var a=prompt('实际结果是什么？（可留空。只写发生了什么，别写辩解）',it.actual||'')
+  if(a===null)return
+  if(applyVerdict(D,id,r,a)){
+    persist();render();toast('已判定：'+r)
+  }
+}
+function reopen(id){
+  if(reopenVerdict(D,id)){persist();render();toast('已撤回，重新待验证')}
+}
+function del(id){
+  if(!confirm('删除这条记录？不可恢复。'))return
+  var nd=[]
+  for(var i=0;i<D.length;i++){if(D[i].id!==id)nd.push(D[i])}
+  D=nd;persist();render();toast('已删除')
+}
+function dueStamp(it){
+  var od=overdueDays(it)
+  if(od>0)return '<span class="badge od">逾期 '+od+' 天</span>'
+  return ''
+}
+function itemHTML(it){
+  var p=[]
+  p.push('<div class="item'+(it.result?'':' due')+'">')
+  p.push('<div class="meta">')
+  p.push('<span class="badge">'+tierLabel(it.score)+'</span>')
+  p.push('<span>'+esc(it.field)+'</span>')
+  p.push('<span>'+esc(it.src)+'</span>')
+  p.push('<span class="badge '+kindCls(it.kind)+'">'+esc(it.kind)+'</span>')
+  p.push('<span>'+it.date+' 记</span>')
+  p.push('<span>验 '+esc(it.due)+'</span>')
+  p.push(dueStamp(it))
+  p.push('</div>')
+  p.push('<div class="txt">'+esc(it.text)+'</div>')
+  if(it.body)p.push('<div class="r body">身体感：'+esc(it.body)+'</div>')
+  if(it.basis)p.push('<div class="basis">依据：'+esc(it.basis)+'</div>')
+  if(it.result){
+    p.push('<div class="r res"><span class="badge '+resCls(it.result)+'">'+esc(it.result)+'</span>'+(it.actual?' '+esc(it.actual):'')+'<span style="color:var(--sub)"> · 判定于 '+it.doneDate+'</span></div>')
+  }
+  p.push('<div class="acts">')
+  if(it.result){
+    p.push('<button onclick="reopen(\''+it.id+'\')">撤回重判</button>')
+  }else{
+    p.push('<button class="ok" onclick="verdict(\''+it.id+'\',\'中了\')">中了</button>')
+    p.push('<button class="ok" onclick="verdict(\''+it.id+'\',\'部分中\')">部分中</button>')
+    p.push('<button class="no" onclick="verdict(\''+it.id+'\',\'没中\')">没中</button>')
+  }
+  p.push('<button onclick="del(\''+it.id+'\')">删除</button>')
+  p.push('</div></div>')
+  return p.join('')
+}
+function render(){
+  var P=[],Q=[]
+  for(var i=0;i<D.length;i++){var it=D[i];(it.result?Q:P).push(it)}
+  P.sort(function(a,b){return a.due<b.due?-1:(a.due>b.due?1:0)})
+  Q.sort(function(a,b){return a.doneDate<b.doneDate?1:(a.doneDate>b.doneDate?-1:0)})
+  var pendN=P.length,overN=0
+  for(var j=0;j<P.length;j++){if(overdueDays(P[j])>0)overN++}
+  document.getElementById('h_pending').textContent='待验证（'+pendN+' 条'+(overN?' · 逾期 '+overN+' 条':'')+'）'
+  var tab=document.getElementById('tab_pending')
+  tab.innerHTML='待验证 '+(pendN?'<i class="nbadge'+(overN?' warn':'')+'">'+pendN+'</i>':'')
+  document.getElementById('list_pending').innerHTML=P.length?P.map(itemHTML).join(''):'<div class="empty">暂无待验证 · 去「记录」存一条预感</div>'
+  document.getElementById('list_done').innerHTML=Q.length?Q.map(itemHTML).join(''):'<div class="empty">还没有验证完的预感</div>'
+  stats()
+}
+function cardsHTML(st){
+  function card(k,v,sub,extra){
+    var cls='scard'+(extra&&extra.click?' clickable':'')
+    var vcls=(extra&&extra.warn&&st.overdue>0)?'v warn':'v'
+    var on=(extra&&extra.click)?' onclick="go(1)"':''
+    return '<div class="'+cls+'"'+on+'><div class="k">'+k+'</div><div class="'+vcls+'">'+v+'</div>'+(sub?'<div class="s">'+sub+'</div>':'')+'</div>'
+  }
+  var c=[]
+  c.push(card('已验证',''+st.done+' / '+st.total,st.done?'总记 '+st.total:'还没有验证记录'))
+  c.push(card('总命中率',st.rate==null?'—':st.rate+'%','部分中按 0.5'))
+  c.push(card('高信心 ≥7',st.hi&&st.hi.n?st.hi.rate+'%':'—','样本 '+(st.hi?st.hi.n:0)))
+  c.push(card('低信心 ≤4',st.lo&&st.lo.n?st.lo.rate+'%':'—','样本 '+(st.lo?st.lo.n:0)))
+  c.push(card('逾期未验证',''+st.overdue,st.overdue?'点我去清账':'0 条，干净',{click:true,warn:true}))
+  return c.join('')
+}
+function rowsHTML(rows){
+  if(!rows.length)return '<div class="empty">还没有已验证的数据</div>'
+  var p=['<table><tr><th>分组</th><th>样本</th><th>命中分</th><th>命中率</th><th>分布</th></tr>']
+  for(var i=0;i<rows.length;i++){
+    var g=rows[i],r=rateOf(g.items)
+    var n=r?r.n:0,rate=r?r.rate:null
+    p.push('<tr'+(n<5?' class="fade"':'')+'><td>'+esc(g.k)+'</td><td>'+n+'</td><td>'+(r?(r.h%1?r.h.toFixed(1):r.h):0)+'</td><td><b>'+(rate==null?'—':rate+'%')+'</b></td>')
+    p.push('<td><div class="bar"><i style="width:'+(rate==null?0:Math.max(rate,2))+'%"></i></div></td></tr>')
+  }
+  p.push('</table>')
+  return p.join('')
+}
+function sortedByOrder(list,order){
+  list.sort(function(a,b){
+    var ia=order.indexOf(a.k),ib=order.indexOf(b.k)
+    ia=ia<0?99:ia;ib=ib<0?99:ib
+    return ia-ib
+  })
+  return list
+}
+function chartSVG(){
+  var gs=tierGroups(D)
+  var W=340,H=5*30+10,X0=110,XMAX=140
+  var p=['<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="按强度档的命中率">']
+  for(var i=0;i<gs.length;i++){
+    var r=rateOf(gs[i].items),y=i*30+14
+    p.push('<text x="8" y="'+(y+11)+'" font-size="11" fill="#8a857c">'+SHORT_TIER[i]+'</text>')
+    if(r&&r.n){
+      var w=Math.max(2,r.rate/100*XMAX)
+      p.push('<rect x="'+X0+'" y="'+y+'" width="'+w.toFixed(1)+'" height="13" rx="3" fill="#6b7f5e"/>')
+      p.push('<text x="'+(X0+XMAX+10)+'" y="'+(y+11)+'" font-size="11" fill="#2b2925">'+r.rate+'%</text>')
+      p.push('<text x="'+(X0+XMAX+46)+'" y="'+(y+11)+'" font-size="10" fill="#8a857c">n='+r.n+'</text>')
+    }else{
+      p.push('<text x="'+(X0+XMAX+10)+'" y="'+(y+11)+'" font-size="11" fill="#c9c5bc">—</text>')
+    }
+  }
+  p.push('</svg>')
+  return p.join('')
+}
+function stats(){
+  var st=summarize(D)
+  document.getElementById('sumCards').innerHTML=cardsHTML(st)
+  var kindRows=sortedByOrder(groupVerified(D,function(x){return x.kind}),['直觉','疑似焦虑','疑似欲望','疑似偏见','未标'])
+  var ins=insight(st,kindRows)
+  var lines=[]
+  for(var i=0;i<ins.length;i++){lines.push('<b>·</b> '+esc(ins[i]))}
+  document.getElementById('insight').innerHTML=lines.join('<br>')
+  document.getElementById('tierChart').innerHTML=chartSVG()
+  document.getElementById('t_kind').innerHTML=rowsHTML(kindRows)
+  document.getElementById('t_src').innerHTML=rowsHTML(groupVerified(D,function(x){return x.src}))
+  document.getElementById('t_field').innerHTML=rowsHTML(groupVerified(D,function(x){return x.field}))
+  document.getElementById('data_count').textContent='当前共 '+D.length+' 条记录（含已验证 '+st.done+' 条）'
+}
+function dl(name,text){
+  try{
+    if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()){
+      var P=window.Capacitor.Plugins
+      if(P&&P.Filesystem&&P.Share){
+        P.Filesystem.writeFile({path:name,data:text,recursive:true,directory:'CACHE'}).then(function(res){
+          P.Share.share({title:'预感校准本导出',text:name,files:[res.uri],dialogTitle:'保存或分享'}).catch(function(){})
+        }).catch(function(err){toast('APK 内导出失败：'+err.message);expFallback(name,text)})
+        return
+      }
+    }
+  }catch(e){}
+  expFallback(name,text)
+}
+function expFallback(name,text){
+  var b=new Blob([text],{type:'text/plain;charset=utf-8'})
+  var a=document.createElement('a')
+  a.href=URL.createObjectURL(b)
+  a.download=name
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+function q(s){return '"'+String(s==null?'':s).replace(/"/g,'""')+'"'}
+function expCSV(){
+  var h=['日期','预感','强度','分档','领域','来源','真假标记','身体感','依据','验证日','结果','实际结果','判定日']
+  var rows=[h.join(',')]
+  for(var i=0;i<D.length;i++){
+    var x=D[i]
+    rows.push([x.date,x.text,x.score,tierLabel(x.score),x.field,x.src,x.kind,x.body,x.basis,x.due,x.result,x.actual,x.doneDate].map(q).join(','))
+  }
+  dl('预感校准_'+todayISO()+'.csv',String.fromCharCode(0xFEFF)+rows.join('\r\n'))
+}
+function expJSON(){
+  dl('预感校准备份_'+todayISO()+'.json',JSON.stringify(D,null,1))
+}
+function normalizeRaw(x){
+  if(!x||typeof x!=='object'||!x.text)return null
+  var s=+x.score
+  if(!isFinite(s)||s<0)s=0
+  var r=(['中了','部分中','没中'].indexOf(x.result)>=0)?x.result:''
+  var id=String(x.id==null?(Date.now()+'-'+Math.floor(Math.random()*1e6)):x.id).replace(/[^A-Za-z0-9_-]/g,'')
+  if(!id)id='imp-'+Date.now()
+  return {
+    id:id,
+    date:x.date||todayISO(),
+    text:String(x.text),
+    score:s,
+    field:x.field||'未分类',
+    src:x.src||'未标',
+    kind:x.kind||'未标',
+    body:x.body||'',
+    basis:x.basis||'',
+    due:x.due||todayISO(30),
+    result:r,
+    actual:x.actual||'',
+    doneDate:x.doneDate||(r?todayISO():'')
+  }
+}
+function impJSON(el){
+  var f=el.files[0]
+  if(!f)return
+  var rd=new FileReader()
+  rd.onload=function(e){
+    try{
+      var arr=JSON.parse(e.target.result)
+      if(!Array.isArray(arr))throw new Error('not array')
+      var clean=[]
+      for(var i=0;i<arr.length;i++){var n=normalizeRaw(arr[i]);if(n)clean.push(n)}
+      if(!clean.length){toast('没读到有效记录');return}
+      if(!confirm('导入 '+clean.length+' 条，将覆盖当前 '+D.length+' 条数据？'))return
+      D=clean;persist();render();toast('导入成功')
+    }catch(err){toast('文件格式不对，需为 JSON 数组')}
+  }
+  rd.readAsText(f)
+  el.value=''
+}
+function migrateV1(){
+  var raw=null
+  try{raw=localStorage.getItem(V1_KEY)}catch(e){}
+  if(!raw){toast('没有发现旧版 v1 数据（键 gut_calib_v1）');return}
+  var arr=null
+  try{arr=JSON.parse(raw)}catch(e){toast('v1 数据无法解析');return}
+  if(!Array.isArray(arr)){toast('v1 数据格式不对');return}
+  var ids={}
+  for(var i=0;i<D.length;i++){ids[D[i].id]=true}
+  var add=0
+  for(var j=0;j<arr.length;j++){
+    var n=normalizeRaw(arr[j])
+    if(n&&!ids[n.id]){D.push(n);ids[n.id]=true;add++}
+  }
+  persist();render();toast('并入 '+add+' 条 v1 记录'+(arr.length-add>0?'（跳过重复 '+(arr.length-add)+' 条）':''))
+}
+function clearAll(){
+  if(!confirm('确定清空全部 '+D.length+' 条记录？'))return
+  if(!confirm('再次确认：清空不可恢复。建议先在「数据」页备份。'))return
+  D=[];persist();render();toast('已清空')
+}
+
+build()
+render()
+
+/* 自测门：?selftest=1 时跑端到端冒烟，headless 浏览器据此验证 */
+(function(){
+  var qs=null
+  try{qs=location.search.indexOf('selftest=1')>=0}catch(e){return}
+  if(!qs)return
+  var out=[]
+  function ok(cond,msg){out.push((cond?'PASS ':'FAIL ')+msg)}
+  try{
+    D=[]
+    document.getElementById('f_text').value='自测A：下周甲方会拖延付款'
+    document.getElementById('f_basis').value='回款已拖三天'
+    document.getElementById('f_due').value=todayISO()
+    sel={score:9,field:'工作',src:'模式识别',kind:'直觉',body:['胸口发紧']}
+    save()
+    ok(D.length===1,'保存第1条成功')
+    document.getElementById('f_text').value='自测B：这顿饭会很难吃'
+    document.getElementById('f_due').value=todayISO()
+    sel={score:3,field:'关系',src:'情绪残留',kind:'疑似焦虑',body:[]}
+    save()
+    ok(D.length===2,'保存第2条成功')
+    ok(document.getElementById('list_pending').textContent.indexOf('甲方会拖延付款')>=0,'待验证列表渲染')
+    ok(applyVerdict(D,D[0].id,'中了','果然拖延了'),'判定A=中了')
+    ok(applyVerdict(D,D[1].id,'部分中','一般难吃'),'判定B=部分中')
+    render()
+    var st=summarize(D)
+    ok(st.done===2&&st.hits===1.5,'完成2条验证，部分中按0.5计分')
+    ok(st.rate===75,'总命中率75%')
+    ok(st.hi&&st.hi.n===1&&st.hi.rate===100,'高强度档100%')
+    ok(st.lo&&st.lo.n===1&&st.lo.rate===50,'低强度档50%')
+    var tscore=document.getElementById('t_score')
+    ok(!tscore,'无t_score元素属预期(v2改用tierChart)')
+    ok(document.getElementById('list_done').textContent.indexOf('果然拖延了')>=0,'已验列表含实际结果')
+    ok(document.getElementById('tierChart').textContent.indexOf('100%')>=0,'校准曲线含100%')
+    ok(document.getElementById('t_kind').textContent.indexOf('直觉')>=0&&document.getElementById('t_kind').textContent.indexOf('疑似焦虑')>=0,'真假标记对照表渲染')
+    ok(document.getElementById('insight').textContent.trim().length>0,'校准洞察有输出')
+    D[0].result=''
+    D[0].due=todayISO(-5)
+    render()
+    ok(document.getElementById('list_pending').textContent.indexOf('逾期')>=0,'逾期标记渲染')
+    ok(summarize(D).overdue===1,'逾期计数=1')
+    var bad=[]
+    for(var i=0;i<out.length;i++){if(out[i].indexOf('FAIL')===0)bad.push(out[i])}
+    document.body.setAttribute('data-selftest',bad.length?'FAIL: '+bad[0].replace(/"/g,''):'PASS')
+  }catch(e){
+    document.body.setAttribute('data-selftest','FAIL: '+String(e&&e.message||e).replace(/"/g,''))
+  }
+})();
+</script>
+</body>
+</html>
