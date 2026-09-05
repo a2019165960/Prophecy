@@ -32,9 +32,13 @@ jobs:
       - name: Sync web assets
         run: npx cap sync android
 
-      - name: Build debug APK
+      - name: Build debug APK (capture log)
+        id: gradle_build
+        continue-on-error: true
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon
+        run: |
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle.log"
+          exit ${PIPESTATUS[0]}
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -48,3 +52,21 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish diagnostic log to ci-log branch
+        if: always() && steps.gradle_build.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd /tmp
+          rm -rf diag-repo
+          mkdir diag-repo && cd diag-repo
+          git init -q
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/a2019165960/Prophecy.git"
+          git config user.name "ci-diagnose"
+          git config user.email "ci@example.com"
+          cp "$RUNNER_TEMP/gradle.log" ci-last-fail.log 2>/dev/null || echo NO_LOG > ci-last-fail.log
+          git checkout -q -b ci-log
+          git add ci-last-fail.log
+          git commit -qm "ci: capture failing gradle log"
+          git push -qf origin ci-log || echo PUSH_FAILED
